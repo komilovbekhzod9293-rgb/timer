@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -136,7 +137,7 @@
 
 <script>
   const WEBHOOK = 'https://n8n.srv1215497.hstgr.cloud/webhook/f2d24888-9723-4e56-96ee-f2dddec2e855';
-  const NAMES = ['Ziyoda', 'Muslima', 'Rais', 'Rayhona', 'Jamshid','Omina', 'Muxlisa' ];
+  const NAMES = ['Ziyoda', 'Muslima', 'Rais', 'Rayhona', 'Jamshid', 'Omina', 'Muxlisa'];
 
   let selectedName = null, selectedFilial = 'Novza Filial', startTime = null, timerInterval = null;
 
@@ -200,7 +201,7 @@
       await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event: 'start', name: selectedName, filial: selectedFilial, time: formatTime(startTime), date: formatDate(startTime), datetime: formatDateTime(startTime) })
+        body: JSON.stringify({ event: 'start', name: selectedName, filial: selectedFilial, time: formatTime(startTime), date: formatDate(startTime) })
       });
     } catch(e) { console.warn(e); }
     showActive();
@@ -235,10 +236,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           event: 'stop', name: selectedName, filial: selectedFilial,
-          time: formatTime(startTime),
           date: formatDate(startTime),
-          start_time: formatDateTime(startTime),
-          end_time: formatDateTime(endTime),
+          start_time: formatTime(startTime),
+          end_time: formatTime(endTime),
           duration_seconds: elapsed, duration_formatted: duration
         })
       });
@@ -272,7 +272,6 @@
   function pad(n) { return String(n).padStart(2,'0'); }
   function formatTime(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
   function formatDate(d) { return d.toLocaleDateString('ru-RU'); }
-  function formatDateTime(d) { return d.toLocaleDateString('ru-RU') + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
   function formatDuration(s) {
     const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
     return h > 0 ? h + 'ч ' + pad(m) + 'м' : m + 'м ' + pad(s%60) + 'с';
