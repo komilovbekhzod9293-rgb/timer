@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Учёт времени — Avtotest7</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f5f5f5;
+      --white: #ffffff;
+      --black: #111111;
+      --gray: #888888;
+      --gray-light: #e0e0e0;
+      --red: #cc0000;
+      --green: #1a7a1a;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      font-family: 'Barlow', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 2px solid var(--black);
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .header {
+      background: var(--black);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-avto {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #888;
+    }
+
+    .logo-test {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .logo-7 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      border-left: 2px solid #555;
+      padding-left: 8px;
+      margin-left: 4px;
+    }
+
+    .header-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .deco-lines {
+      height: 6px;
+      background:
+        linear-gradient(var(--black), var(--black)) 0 1px / 100% 1px no-repeat,
+        linear-gradient(var(--black), var(--black)) 0 4px / 100% 1px no-repeat,
+        var(--white);
+    }
+
+    .body { padding: 22px 20px 18px; }
+
+    #screen-select { display: flex; flex-direction: column; }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-light);
+    }
+
+    .name-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .name-btn {
+      background: var(--white);
+      border: 1.5px solid var(--gray-light);
+      padding: 13px 10px;
+      color: var(--black);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.1s;
+      text-align: center;
+    }
+
+    .name-btn:hover { border-color: var(--black); background: var(--bg); }
+
+    .name-btn.selected {
+      border: 2px solid var(--black);
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-start {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 15px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.1s;
+      opacity: 0.25;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-start.active { opacity: 1; pointer-events: all; }
+    .btn-start.active:hover { background: #333; }
+
+    #screen-active { display: none; flex-direction: column; align-items: center; }
+
+    .active-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--black);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .active-since {
+      font-size: 12px;
+      color: var(--gray);
+      letter-spacing: 0.08em;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .status-bar {
+      width: 100%;
+      background: var(--black);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      background: #4cff4c;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .status-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .timer-display {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--black);
+      margin-bottom: 22px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .timer-sep {
+      color: var(--gray);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.15; }
+    }
+
+    .btn-stop {
+      background: var(--white);
+      border: 2px solid var(--red);
+      color: var(--red);
+      padding: 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-stop:hover { background: var(--red); color: var(--white); }
+
+    #screen-sent { display: none; flex-direction: column; align-items: center; text-align: center; }
+
+    .check-box {
+      width: 48px; height: 48px;
+      border: 2.5px solid var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .sent-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 4px;
+    }
+
+    .sent-sub { font-size: 12px; color: var(--gray); margin-bottom: 2px; }
+
+    .sent-duration {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--black);
+      margin: 12px 0;
+      line-height: 1;
+    }
+
+    .sent-ok {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1.5px solid var(--gray-light);
+      color: var(--gray);
+      padding: 12px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.1s;
+    }
+
+    .btn-reset:hover { border-color: var(--black); color: var(--black); }
+
+    .error-msg {
+      font-size: 11px;
+      color: var(--red);
+      text-align: center;
+      margin-top: 10px;
+      min-height: 14px;
+    }
+
+    .filial-toggle {
+      display: flex;
+      border: 2px solid var(--black);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .filial-btn {
+      flex: 1;
+      padding: 10px 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--white);
+      color: var(--gray);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .filial-btn.active {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .filial-divider {
+      width: 2px;
+      background: var(--black);
+      flex-shrink: 0;
+    }
+
+    .footer-line {
+      border-top: 1px solid var(--gray-light);
+      padding: 8px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      color: var(--gray-light);
+      letter-spacing: 0.1em;
+    }
+
+    .clock {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+
+    <div class="header">
+      <div>
+        <span class="logo-avto">AVTO</span><span class="logo-test">TEST</span><span class="logo-7">7</span>
+      </div>
+      <div class="header-sub">Учёт времени</div>
+    </div>
+    <div class="deco-lines"></div>
+
+    <div class="body">
+
+      <!-- SELECT -->
+      <div id="screen-select">
+        <div class="filial-toggle">
+          <button class="filial-btn active" id="filialNovza" onclick="selectFilial('Novza Filial', this)">Novza<br>Filial</button>
+          <div class="filial-divider"></div>
+          <button class="filial-btn" id="filialYunus" onclick="selectFilial('Yunusobod Filial', this)">Yunusobod<br>Filial</button>
+        </div>
+        <div class="section-label">Выберите менеджера</div>
+        <div class="name-grid" id="nameGrid"></div>
+        <button class="btn-start" id="btnStart" onclick="startSession()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg>
+          НАЧАТЬ СМЕНУ
+        </button>
+        <div class="error-msg" id="errSelect"></div>
+      </div>
+
+      <!-- ACTIVE -->
+      <div id="screen-active">
+        <div class="active-name" id="activeName"></div>
+        <div class="active-since" id="activeSince"></div>
+        <div class="status-bar">
+          <div class="status-dot"></div>
+          <div class="status-text">Смена идёт</div>
+        </div>
+        <div class="timer-display" id="timerDisplay">00<span class="timer-sep">:</span>00<span class="timer-sep">:</span>00</div>
+        <button class="btn-stop" id="btnStop" onclick="stopSession()">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10"/></svg>
+          ЗАВЕРШИТЬ СМЕНУ
+        </button>
+        <div class="error-msg" id="errActive"></div>
+      </div>
+
+      <!-- SENT -->
+      <div id="screen-sent">
+        <div class="check-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="sent-title">Смена завершена</div>
+        <div class="sent-sub" id="sentName"></div>
+        <div class="sent-duration" id="sentDuration"></div>
+        <div class="sent-ok">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Данные отправлены
+        </div>
+        <button class="btn-reset" onclick="resetToSelect()">← НОВАЯ СМЕНА</button>
+      </div>
+
+    </div>
+
+    <div class="footer-line">
+      <div class="footer-text">AVTOTEST7 © 2026</div>
+      <div class="clock" id="clockDisplay"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WEBHOOK = 'https://n8n.srv1215497.hstgr.cloud/webhook/f2d24888-9723-4e56-96ee-f2dddec2e855';
+  const NAMES = ['Ziyoda', 'Muslima', 'Rais', 'Rayhona', 'Jamshid'];
+
+  let selectedName = null, selectedFilial = 'Novza Filial', startTime = null, timerInterval = null;
+
+  function selectFilial(filial, btn) {
+    selectedFilial = filial;
+    document.querySelectorAll('.filial-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Restore session from localStorage on load
+  function restoreSession() {
+    const saved = localStorage.getItem('avtotest7_session');
+    if (!saved) return;
+    try {
+      const s = JSON.parse(saved);
+      if (s.name && s.startTime) {
+        selectedName = s.name;
+        selectedFilial = s.filial || 'Novza Filial';
+        startTime = new Date(s.startTime);
+        showActive();
+      }
+    } catch(e) { localStorage.removeItem('avtotest7_session'); }
+  }
+
+  function saveSession() {
+    localStorage.setItem('avtotest7_session', JSON.stringify({
+      name: selectedName,
+      filial: selectedFilial,
+      startTime: startTime.toISOString()
+    }));
+  }
+
+  function clearSession() {
+    localStorage.removeItem('avtotest7_session');
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clockDisplay').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const grid = document.getElementById('nameGrid');
+  NAMES.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'name-btn';
+    btn.textContent = name;
+    btn.onclick = () => selectName(name, btn);
+    grid.appendChild(btn);
+  });
+
+  function selectName(name, btn) {
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedName = name;
+    document.getElementById('btnStart').classList.add('active');
+  }
+
+  async function startSession() {
+    if (!selectedName) return;
+    startTime = new Date();
+    const btn = document.getElementById('btnStart');
+    btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+    btn.innerHTML = 'ОТПРАВКА...';
+    saveSession();
+    try {
+      await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'start', name: selectedName, filial: selectedFilial, start_time: startTime.toISOString(), start_time_local: formatDateTime(startTime) })
+      });
+    } catch(e) { console.warn(e); }
+    showActive();
+  }
+
+  function showActive() {
+    show('screen-active');
+    document.getElementById('activeName').textContent = selectedName;
+    document.getElementById('activeSince').textContent = 'начало: ' + formatTime(startTime);
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  }
+
+  function updateTimer() {
+    const s = Math.floor((Date.now() - startTime) / 1000);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    document.getElementById('timerDisplay').innerHTML =
+      pad(h) + '<span class="timer-sep">:</span>' + pad(m) + '<span class="timer-sep">:</span>' + pad(sec);
+  }
+
+  async function stopSession() {
+    clearInterval(timerInterval);
+    const endTime = new Date();
+    const elapsed = Math.floor((endTime - startTime) / 1000);
+    const duration = formatDuration(elapsed);
+    const btn = document.getElementById('btnStop');
+    btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+    btn.innerHTML = 'ОТПРАВКА...';
+    try {
+      await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'stop', name: selectedName, filial: selectedFilial,
+          start_time: startTime.toISOString(), start_time_local: formatDateTime(startTime),
+          end_time: endTime.toISOString(), end_time_local: formatDateTime(endTime),
+          duration_seconds: elapsed, duration_formatted: duration
+        })
+      });
+    } catch(e) {
+      document.getElementById('errActive').textContent = 'Ошибка отправки. Запишите время вручную.';
+    }
+    clearSession();
+    document.getElementById('sentName').textContent = selectedName;
+    document.getElementById('sentDuration').textContent = duration;
+    show('screen-sent');
+  }
+
+  function resetToSelect() {
+    selectedName = null; startTime = null;
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    const sb = document.getElementById('btnStart');
+    sb.classList.remove('active'); sb.style.opacity = ''; sb.style.pointerEvents = '';
+    sb.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg> НАЧАТЬ СМЕНУ';
+    const stb = document.getElementById('btnStop');
+    stb.style.opacity = ''; stb.style.pointerEvents = '';
+    stb.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10"/></svg> ЗАВЕРШИТЬ СМЕНУ';
+    show('screen-select');
+  }
+
+  function show(id) {
+    ['screen-select','screen-active','screen-sent'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? 'flex' : 'none';
+    });
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function formatTime(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function formatDateTime(d) {
+    return d.toLocaleDateString('ru-RU') + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  function formatDuration(s) {
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+    return h > 0 ? h + 'ч ' + pad(m) + 'м' : m + 'м ' + pad(s%60) + 'с';
+  }
+
+  restoreSession();
+</script>
+</body>
+</html>
