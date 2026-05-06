@@ -139,7 +139,6 @@
   const NAMES = ['Ziyoda', 'Muslima', 'Rais', 'Rayhona', 'Jamshid', 'Omina', 'Muxlisa'];
 
   let selectedName = null, selectedFilial = 'Novza Filial', startTime = null, timerInterval = null;
-  // ФИХ 2: флаг защиты от двойного нажатия на стоп
   let isStopping = false;
 
   function selectFilial(filial, btn) {
@@ -191,14 +190,11 @@
     document.getElementById('btnStart').classList.add('active');
   }
 
-  async function startSession() {
+  function startSession() {
     if (!selectedName) return;
     startTime = new Date();
-    const btn = document.getElementById('btnStart');
-    btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
-    btn.innerHTML = 'ОТПРАВКА...';
     saveSession();
-    // fire-and-forget — не ждём ответа
+    // fire-and-forget — таймер стартует сразу, не ждёт ответа сервера
     fetch(WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -208,7 +204,7 @@
   }
 
   function showActive() {
-    // ФИХ 1: убиваем старый интервал перед запуском нового
+    // убиваем старый интервал перед запуском нового
     if (timerInterval) clearInterval(timerInterval);
     show('screen-active');
     document.getElementById('activeName').textContent = selectedName;
@@ -224,8 +220,8 @@
       pad(h) + '<span class="timer-sep">:</span>' + pad(m) + '<span class="timer-sep">:</span>' + pad(sec);
   }
 
-  async function stopSession() {
-    // ФИХ 2: защита от двойного нажатия
+  function stopSession() {
+    // защита от двойного нажатия
     if (isStopping || !startTime) return;
     isStopping = true;
 
@@ -235,11 +231,11 @@
     const endTime = new Date();
     const elapsed = Math.floor((endTime - startTime) / 1000);
     const duration = formatDuration(elapsed);
+
     const btn = document.getElementById('btnStop');
     btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
-    btn.innerHTML = 'ОТПРАВКА...';
 
-    // fire-and-forget — не ждём ответа
+    // fire-and-forget — экран результата показывается сразу
     fetch(WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
